@@ -1,3 +1,4 @@
+use std::io;
 fn main() {
     println!("Welcome back!");
     let ferris_ascii = "
@@ -10,8 +11,14 @@ fn main() {
     let mut shells: i32 = 5;
     let mut age: i32 = 0;
     println!("{ferris_ascii}");
+    while 1 {
+        update(&mut ferris_hunger, &mut ferris_boredom, &mut shells, &mut age);
+    }
 }
 
-fn game_loop(hunger: &mut i32, boredom: &mut)
+
+fn update(hunger: &mut i32, boredom: &mut i32, shells: &mut i32, age: &mut i32) {
+
+}
 
 
