@@ -1,24 +1,63 @@
+#[allow(unused_imports)]
 use std::io;
+use std::thread;
+use std::time::Duration;
+
+enum Emotions {
+    Happy,
+    Sad,
+    Hungry,
+    Bored,
+    Sleepy,
+}
+
+struct Ferris {
+    hunger: i32,
+    boredom: i32,
+    shells: i32,
+    age: f32,
+    emotion: Emotions,
+}
+
 fn main() {
     println!("Welcome back!");
+    let mut currentferris = initialise(0, 0, 5, 0.0, "happy");
     let ferris_ascii = "
         _~^~^~_
     \\) /  o o  \\ (/
       '_   -   _'
       / '-----' \\";
-    let mut ferris_hunger: i32 = 0;
-    let mut ferris_boredom: i32 = 0;
-    let mut shells: i32 = 5;
-    let mut age: i32 = 0;
+
     println!("{ferris_ascii}");
-    while 1 {
-        update(&mut ferris_hunger, &mut ferris_boredom, &mut shells, &mut age);
+    loop {
+        currentferris = update(currentferris, 1, 1, 0, 0.1);
+        thread::sleep(Duration::from_millis(10));
     }
 }
 
-
-fn update(hunger: &mut i32, boredom: &mut i32, shells: &mut i32, age: &mut i32) {
-
+fn initialise(hunger: i32, boredom: i32, shells: i32, age: f32, emo: &str) -> Ferris {
+    return Ferris {
+        hunger,
+        boredom,
+        shells,
+        age,
+        emotion: match emo {
+            "happy" => Emotions::Happy,
+            "sad" => Emotions::Sad,
+            "hungry" => Emotions::Hungry,
+            "bored" => Emotions::Bored,
+            "sleepy" => Emotions::Sleepy,
+            &_ => Emotions::Happy,
+        },
+    };
 }
 
-
+fn update(state: Ferris, hincrease: i32, bincrease: i32, sincrease: i32, aincrease: f32) -> Ferris {
+    return Ferris {
+        hunger: state.hunger + hincrease,
+        boredom: state.boredom + bincrease,
+        shells: state.shells + sincrease,
+        age: state.age + aincrease,
+        emotion: state.emotion,
+    };
+}
