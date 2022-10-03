@@ -1,9 +1,19 @@
 #[allow(unused_imports)]
+use serde::{Deserialize, Serialize};
 use std::io;
 use std::env;
 use std::fs;
 use std::thread;
 use std::time::Duration;
+//struct for json save data loading
+#[derive(Serialize, Deserialize)]
+struct Save {
+    hunger: i32,
+    boredom: i32,
+    shells: i32,
+    age: f32,
+    emotion: String,
+}
 //enum to hold possible ferris emotions
 enum Emotions {
     Happy,
@@ -22,11 +32,8 @@ struct Ferris {
 }
 
 fn main() {
-    let json_path = "ferris.json";
-    let ferris_json = fs::read_to_string(json_path).expect("something is wrong with the save");
-    println!("{ferris_json}");
     println!("Welcome back!");
-    let mut currentferris = initialise(0, 0, 5, 0.0, "happy");
+    let mut currentferris = initialise();
     let ferris_ascii = "
         _~^~^~_
     \\) /  o o  \\ (/
@@ -40,13 +47,17 @@ fn main() {
     }
 }
 //this will be used at the beginning to load data from the json save
-fn initialise(hunger: i32, boredom: i32, shells: i32, age: f32, emo: &str) -> Ferris {
+fn initialise() -> Ferris {
+    let json_path = "ferris.json";
+    let ferris_json = fs::read_to_string(json_path).expect("something is wrong with the save");
+    println!("{ferris_json}");
+    let json_read: Save = read_json(&ferris_json);
     return Ferris {
-        hunger,
-        boredom,
-        shells,
-        age,
-        emotion: match emo {
+        hunger: json_read.hunger,
+        boredom: json_read.boredom,
+        shells: json_read.shells,
+        age: json_read.age,
+        emotion: match json_read.emotion.as_str() {
             "happy" => Emotions::Happy,
             "sad" => Emotions::Sad,
             "hungry" => Emotions::Hungry,
@@ -65,4 +76,9 @@ fn update(state: Ferris, hincrease: i32, bincrease: i32, sincrease: i32, aincrea
         age: state.age + aincrease,
         emotion: state.emotion,
     };
+}
+//got this function from medium
+fn read_json(raw_json:&str) -> Save {
+    let parsed: Save = serde_json::from_str(raw_json).unwrap();
+    return parsed
 }
