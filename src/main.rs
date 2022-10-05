@@ -8,14 +8,15 @@ use std::time::Duration;
 //struct for json save data loading
 #[derive(Serialize, Deserialize)]
 struct Save {
-    hunger: i32,
-    boredom: i32,
-    shells: i32,
+    hunger: u32,
+    boredom: u32,
+    shells: u32,
     age: f32,
     emotion: String,
 }
 //enum to hold possible ferris emotions
-enum Emotions {
+#[derive(Copy, Clone)]
+enum Emotions{
     Happy,
     Sad,
     Hungry,
@@ -24,9 +25,9 @@ enum Emotions {
 }
 //struct to hold ferris and his attributes
 struct Ferris {
-    hunger: i32,
-    boredom: i32,
-    shells: i32,
+    hunger: u32,
+    boredom: u32,
+    shells: u32,
     age: f32,
     emotion: Emotions,
 }
@@ -42,7 +43,7 @@ fn main() {
 
     println!("{ferris_ascii}");
     loop {
-        currentferris = update(currentferris, 1, 1, 0, 0.1);
+        currentferris = update(&currentferris, 1, 1, 0, 0.1);
         thread::sleep(Duration::from_millis(10));
     }
 }
@@ -68,11 +69,15 @@ fn initialise() -> Ferris {
     };
 }
 //used to update ferris constantly
-fn update(state: Ferris, hincrease: i32, bincrease: i32, sincrease: i32, aincrease: f32) -> Ferris {
+fn update(state: &Ferris, mut hincrease: i32, bincrease: i32, sincrease: i32, aincrease: f32) -> Ferris {
+
+    if(state.hunger as i32 + hincrease < 0){
+        hincrease = (state.hunger as i32) * -1;
+    }
     return Ferris {
-        hunger: state.hunger + hincrease,
-        boredom: state.boredom + bincrease,
-        shells: state.shells + sincrease,
+        hunger: ((state.hunger as i32) + hincrease) as u32,
+        boredom:((state.boredom as i32) + bincrease) as u32,
+        shells: ((state.shells as i32) + sincrease) as u32,
         age: state.age + aincrease,
         emotion: state.emotion,
     };
@@ -80,5 +85,23 @@ fn update(state: Ferris, hincrease: i32, bincrease: i32, sincrease: i32, aincrea
 //got this function from medium
 fn read_json(raw_json:&str) -> Save {
     let parsed: Save = serde_json::from_str(raw_json).unwrap();
-    return parsed
+    return parsed;
+}
+
+fn feed(amount: i32, state: &Ferris) -> Ferris{
+    return update(&state, amount, 0, 0, 0.0);
+}
+
+fn play(game: &String) {
+    let shells: i32 = match game.as_str() {
+        "scramble" => scramble(),
+        &_ => 0,
+    };
+}
+
+fn scramble() -> i32{
+    let mut shells = 0;
+    let scrambles:[&str;4] = ["rstu", "frseir", "gtbiuh", "aorcg"];
+    let unscrambled:[&str;4] = ["rust", "ferris", "github", "cargo"];
+    return 0;
 }
